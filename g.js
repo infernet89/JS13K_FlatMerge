@@ -15,6 +15,8 @@ var selectedObject=null;
 var exitObject;
 var noneSelected;
 var cooldown;
+var mergeObject;
+var mergedObjectContainer;
 
 //mobile controls
 var mousex=-100;
@@ -44,7 +46,7 @@ drawableObjects.push(tmp);
 exitObject=tmp;
 
 //create random objects
-for(i=0;i<200;i++)
+for(i=0;i<80;i++)
 {
     tmp=new Object();
     tmp.size=16;
@@ -54,7 +56,7 @@ for(i=0;i<200;i++)
     tmp.dx=rand(-5,5);
     tmp.dy=rand(-5,5);
     tmp.dr=rand(-5,5);
-    tmp.type=rand(2,11);//actually, number of edges
+    tmp.type=rand(2,10);//actually, number of edges
     tmp.color="#FFF";
     tmp.isFilled=false;
     drawableObjects.push(tmp); 
@@ -98,33 +100,82 @@ function run()
         ctx.fillText("LEVEL",canvasW-90,canvasH-20);
 
         noneSelected=true;
+        hover=false;
         //draw and move all objects
         drawableObjects.forEach(function(e)
         {
             /*ctx.fillStyle="#F00";
             ctx.fillRect(e.x-e.size,e.y-e.size,e.size*2,e.size*2);*/
 
+
             //check if need to be selected
-            if(dragging && e.type!=2)
+            if(mergeObject!=null || !noneSelected || hover)
+            {
+                //we are merging two object, disable controls.
+                if(mergeObject!=null && selectedObject==e && (selectedObject.x - mergeObject.x)*(selectedObject.x - mergeObject.x)<selectedObject.size && (selectedObject.y - mergeObject.y)*(selectedObject.y - mergeObject.y)<selectedObject.size)
+                {
+                    selectedObject.type++;
+                    selectedObject.dx=mergedObjectContainer.dx;
+                    selectedObject.dy=mergedObjectContainer.dy;
+                    drawableObjects.splice(drawableObjects.indexOf(mergeObject), 1);
+                    mergeObject=null;
+                    selectedObject.isFilled=false;
+                    selectedObject=null;
+                }
+                else if(mergeObject==e)
+                {
+                    ctx.beginPath();
+                    ctx.strokeStyle="#00F";//not blue, for a weird bug
+                    ctx.moveTo(e.x,e.y);
+                    ctx.lineTo(selectedObject.x,selectedObject.y);
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+            }
+            else if(dragging && e.type!=2)
             {
                 if(mousex+10>e.x-e.size && mousex<e.x+e.size && mousey+10>e.y-e.size && mousey<e.y+e.size)
                 {
                     noneSelected=false;
+                    hover=true;
                     cooldown=10;
                     e.isFilled=true;
                     if(selectedObject!=null && selectedObject!=e && selectedObject!=exitObject)
-                        selectedObject.isFilled=false;
+                    {
+                        //we need to merge!
+                        if(selectedObject.type==e.type)
+                        {
+                            mergedObjectContainer=new Object();
+                            mergedObjectContainer.dx=selectedObject.dx+e.dx;
+                            mergedObjectContainer.dy=selectedObject.dy+e.dy;
+                            //change dx and dy in order to put them together, fast
+                            cx=(selectedObject.x+e.x)/2;
+                            cy=(selectedObject.y+e.y)/2;
+                            selectedObject.dx=(cx-selectedObject.x)/20;
+                            selectedObject.dy=(cy-selectedObject.y)/20;
+                            e.dx=(cx-e.x)/20;
+                            e.dy=(cy-e.y)/20;
+
+                            mergeObject=selectedObject;
+                        }
+                        else
+                            selectedObject.isFilled=false;
+                    }                        
                     selectedObject=e;
                 }
             }
-            else if(e.type!=2 && selectedObject!=null && selectedObject!=e && mousex+10>e.x-e.size && mousex<e.x+e.size && mousey+10>e.y-e.size && mousey<e.y+e.size)
+            else if(selectedObject!=null && selectedObject!=e && selectedObject.type==e.type && mousex+10>e.x-e.size && mousex<e.x+e.size && mousey+10>e.y-e.size && mousey<e.y+e.size)
             {
+                hover=true;
                 //linea tra il selected object e quello hovered
+                ctx.beginPath();
                 ctx.strokeStyle="#FFF";
                 ctx.moveTo(e.x,e.y);
                 ctx.lineTo(selectedObject.x,selectedObject.y);
                 ctx.lineWidth = 3;
                 ctx.stroke();
+                ctx.closePath();
             }
 
             drawOject(e);
@@ -143,7 +194,7 @@ function run()
                 e.dx*=-1;
         });
         //clicked outside everything
-        if(--cooldown<0 && dragging && noneSelected && selectedObject!=null)
+        if(--cooldown<0 && dragging && noneSelected && selectedObject!=null && mergeObject==null)
         {
             if(selectedObject!=exitObject)
                 selectedObject.isFilled=false;
@@ -155,8 +206,6 @@ function drawOject(o)
 {//http://www.mathopenref.com/coordpolycalc.html
     var s=o.size;
     ctx.save();
-    ctx.strokeStyle=o.color;
-    ctx.fillStyle=o.color;
     ctx.translate(o.x,o.y);
     ctx.rotate(o.rotation*Math.PI/180);
     ctx.beginPath();
@@ -257,20 +306,12 @@ function drawOject(o)
     }
     else if(o.type==11)
     {//circle
-        //ctx.moveTo(0, 0);
-        ctx.beginPath();
         ctx.arc(0,0,s,0,Math.PI*2,false);
-        ctx.closePath();
     }
-
-
-
-
-
-
-
-
+    ctx.closePath();
     ctx.lineWidth = 1;
+    ctx.strokeStyle=o.color;
+    ctx.fillStyle=o.color;
     if(o.isFilled)
         ctx.fill();
     else
