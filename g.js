@@ -12,11 +12,13 @@ var activeTask;
 var level=1;
 var drawableObjects=[];
 var selectedObject=null;
+var hoveredObject=null;
 var exitObject;
-var noneSelected;
 var cooldown;
-var mergeObject;
-var mergedObjectContainer;
+var mergeObjectA=null;
+var mergeObjectB=null;
+var mergeObjectC=null;
+
 
 //mobile controls
 var mousex=-100;
@@ -28,6 +30,7 @@ canvas = document.getElementById("g");
 ctx = canvas.getContext("2d");
 canvasW=canvas.width  = window.innerWidth;
 canvasH=canvas.height = window.innerHeight;
+var colorTypes=['','','#F0F','#50F','#32E','#14C','#06A','#088','#0A6','#0C4','#0E2','#0F0'];
 
 
 //next level button
@@ -58,6 +61,7 @@ for(i=0;i<80;i++)
     tmp.dr=rand(-5,5);
     tmp.type=rand(2,10);//actually, number of edges
     tmp.color="#FFF";
+    tmp.color=colorTypes[tmp.type];
     tmp.isFilled=false;
     drawableObjects.push(tmp); 
 }
@@ -104,12 +108,13 @@ function run()
         //draw and move all objects
         drawableObjects.forEach(function(e)
         {
+
             /*ctx.fillStyle="#F00";
             ctx.fillRect(e.x-e.size,e.y-e.size,e.size*2,e.size*2);*/
 
 
             //check if need to be selected
-            if(mergeObject!=null || !noneSelected || hover)
+            /*if(mergeObject!=null || !noneSelected || hover)
             {
                 //we are merging two object, disable controls.
                 if(mergeObject!=null && selectedObject==e && (selectedObject.x - mergeObject.x)*(selectedObject.x - mergeObject.x)<selectedObject.size && (selectedObject.y - mergeObject.y)*(selectedObject.y - mergeObject.y)<selectedObject.size)
@@ -176,7 +181,7 @@ function run()
                 ctx.lineWidth = 3;
                 ctx.stroke();
                 ctx.closePath();
-            }
+            }*/
 
             drawOject(e);
             e.x+=e.dx;
@@ -193,15 +198,54 @@ function run()
             if(e.x+e.dx+e.size>canvasW-180 && e.y+e.size>canvasH-80)
                 e.dx*=-1;
         });
-        //clicked outside everything
-        if(--cooldown<0 && dragging && noneSelected && selectedObject!=null && mergeObject==null)
+        //something is selected
+        if(selectedObject!=null && hoveredObject!=null)
         {
-            if(selectedObject!=exitObject)
-                selectedObject.isFilled=false;
-            selectedObject=null;
+            ctx.beginPath();
+            ctx.strokeStyle="#FFF";
+            ctx.moveTo(hoveredObject.x,hoveredObject.y);
+            ctx.lineTo(selectedObject.x,selectedObject.y);
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.closePath();
+        }
+        else if(selectedObject!=null)
+        {
+            ctx.beginPath();
+            ctx.strokeStyle="#FFF";
+            ctx.moveTo(mousex,mousey);
+            ctx.lineTo(selectedObject.x,selectedObject.y);
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.closePath();
+        }
+        //two object need to merge
+        if(mergeObjectA!=null && mergeObjectB!=null && (mergeObjectA.x - mergeObjectB.x)*(mergeObjectA.x - mergeObjectB.x)<mergeObjectA.size && (mergeObjectA.y - mergeObjectB.y)*(mergeObjectA.y - mergeObjectB.y)<mergeObjectA.size)
+        {
+            mergeObjectC.type=mergeObjectA.type+1;
+            mergeObjectC.x=mergeObjectA.x;
+            mergeObjectC.y=mergeObjectA.y;
+            mergeObjectC.color=colorTypes[mergeObjectC.type];
+            mergeObjectC.size=(mergeObjectA.size+mergeObjectB.size)/2;
+            mergeObjectC.rotation=mergeObjectA.rotation+mergeObjectB.rotation;
+
+            drawableObjects.splice(drawableObjects.indexOf(mergeObjectA), 1);
+            drawableObjects.splice(drawableObjects.indexOf(mergeObjectB), 1);
+            drawableObjects.push(mergeObjectC);
+            mergeObjectA=null;
+            mergeObjectB=null;
+            console.log("Merged");
         }
     }
 }
+function getObjectInsideMouse()
+{
+    for(i=0;i<drawableObjects.length;i++)
+        if(mousex+10>drawableObjects[i].x-drawableObjects[i].size && mousex<drawableObjects[i].x+drawableObjects[i].size && mousey+10>drawableObjects[i].y-drawableObjects[i].size && mousey<drawableObjects[i].y+drawableObjects[i].size)
+            return drawableObjects[i];
+    return null;
+}
+
 function drawOject(o)
 {//http://www.mathopenref.com/coordpolycalc.html
     var s=o.size;
@@ -358,14 +402,58 @@ function cliccatoMouse(evt)
     var rect = canvas.getBoundingClientRect();
     mousex=(evt.clientX-rect.left)/(rect.right-rect.left)*canvasW;
     mousey=(evt.clientY-rect.top)/(rect.bottom-rect.top)*canvasH;
+
+    //check if something is selected
+    if(selectedObject!=null)
+        selectedObject.isFilled=false;
+    selectedObject=getObjectInsideMouse();
+    //something cannot be selected
+    if(selectedObject!=null && (selectedObject.type<=2 || selectedObject==exitObject))
+        selectedObject=null;
+
+    if(selectedObject!=null)
+        selectedObject.isFilled=true;
 }
 function mossoMouse(evt)
 {
     var rect = canvas.getBoundingClientRect();
     mousex=(evt.clientX-rect.left)/(rect.right-rect.left)*canvasW;
     mousey=(evt.clientY-rect.top)/(rect.bottom-rect.top)*canvasH;
+
+    if(selectedObject!=null)
+    {
+        hoveredObject=getObjectInsideMouse();
+        if(hoveredObject!=null && hoveredObject.type!=selectedObject.type)
+            hoveredObject=null;
+    }        
 }
 function rilasciatoMouse(evt)
 {
     dragging=false;
+
+    if(selectedObject!=null)
+    {
+        //we need to merge
+        if(hoveredObject!=null)
+        {
+            hoveredObject.isFilled=true;
+            mergeObjectA=selectedObject;
+            mergeObjectB=hoveredObject;
+            
+            mergeObjectC=new Object();
+            mergeObjectC.dx=mergeObjectA.dx+mergeObjectB.dx;
+            mergeObjectC.dy=mergeObjectA.dy+mergeObjectB.dy;
+            //change dx and dy in order to put them together, fast
+            cx=(mergeObjectA.x+mergeObjectB.x)/2;
+            cy=(mergeObjectA.y+mergeObjectB.y)/2;
+            mergeObjectA.dx=(cx-mergeObjectA.x)/20;
+            mergeObjectA.dy=(cy-selectedObject.y)/20;
+            mergeObjectB.dx=(cx-mergeObjectB.x)/20;
+            mergeObjectB.dy=(cy-mergeObjectB.y)/20;
+        }
+        else
+            selectedObject.isFilled=false;
+    }
+    selectedObject=null;
+    hoveredObject=null;
 }
