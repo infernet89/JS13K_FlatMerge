@@ -47,7 +47,7 @@ canvas.addEventListener("mousemove",mossoMouse);
 canvas.addEventListener("mousedown",cliccatoMouse);
 canvas.addEventListener("mouseup",rilasciatoMouse);
 
-level=8;//TODO il menu, sullo ZERO.
+level=1;//TODO il menu, sullo ZERO.
 generateLevel();
 activeTask=setInterval(run, 33);
 
