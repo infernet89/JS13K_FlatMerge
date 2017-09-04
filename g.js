@@ -30,7 +30,7 @@ canvas = document.getElementById("g");
 ctx = canvas.getContext("2d");
 canvasW=canvas.width  = window.innerWidth;
 canvasH=canvas.height = window.innerHeight;
-var colorTypes=['','','#F0F','#50F','#32E','#14C','#06A','#088','#0A6','#0C4','#0E2','#0F0'];
+var colorTypes=['','','#DDD','#D0D','#D00','#00D','#050','#0DD','#D50','#D55','#5D5','#0F0'];
 
 
 /*if (window.navigator.pointerEnabled) {
@@ -47,7 +47,7 @@ canvas.addEventListener("mousemove",mossoMouse);
 canvas.addEventListener("mousedown",cliccatoMouse);
 canvas.addEventListener("mouseup",rilasciatoMouse);
 
-level=1;//TODO il menu, sullo ZERO.
+level=8;//TODO il menu, sullo ZERO.
 generateLevel();
 activeTask=setInterval(run, 33);
 
@@ -82,9 +82,10 @@ function generateLevel()
     else if(level==2)
     {
         addObstacle(150,200,340,45,["If you are feeling some confusion, it's perfectly fine.","It's really hard to find our way in life"]);
-        for(i=0;i<7;i++)
+        addRandomObject(4);
+        for(i=0;i<5;i++)
             addRandomObject(3);
-        for(i=0;i<3;i++)
+        for(i=0;i<15;i++)
             addRandomObject(2);
     }
     else if(level==3)
@@ -92,39 +93,87 @@ function generateLevel()
         addObstacle(150,200,650,45,["Have you ever tried to hit something that is moving, while you are also moving in a different direction?",
                                     "That's what finding our way in life feels like."]);
         addObstacle(420,500,240,30,["Because we're all work-in-progress."]);
-        for(i=0;i<15;i++)
+        addRandomObject(5);
+        for(i=0;i<11;i++)
             addRandomObject(3);
-        for(i=0;i<5;i++)
+        for(i=0;i<9;i++)
             addRandomObject(2);
     }
     else if(level==4)
     {
-        addObstacle(150,200,530,65,["One day some things matter, and another day some things doen't matter anymore.",
+        addObstacle(150,200,530,65,["One day some things matter, and another day some things doesn't matter anymore.",
                                     "You'll never know.",
                                     "You can't predict what will matter someday."]);
         addObstacle(150,400,320,30,["Do you know what REALLY matter in this world?"]);
-        addObstacle(550,480,120,30,["CONNECTIONS."]);
-        for(i=0;i<31;i++)
+        addObstacle(550,480,120,30,["CONNECTIONS"]);
+        for(i=0;i<3;i++)
+            addRandomObject(5);
+        for(i=0;i<19;i++)
             addRandomObject(3);
         for(i=0;i<9;i++)
             addRandomObject(2);
     }
     else if(level==5)
     {
-        for(i=0;i<63;i++)
+        addObstacle(150,200,290,30,["You will not be able to connect to everyone."]);
+        addObstacle(150,300,345,30,["You need to find someone that is kinda similar to you."]);
+        addObstacle(150,400,250,30,["The people you know will change you."]);
+        addObstacle(150,500,500,30,["And, surprisingly, you will find connections in people you wasn't able to relate."]);
+        addObstacle(440,600,210,65,["Wait.","","You had already figured it out?"]);
+        for(i=0;i<2;i++)
+            addRandomObject(6);
+        for(i=0;i<33;i++)
             addRandomObject(3);
         for(i=0;i<7;i++)
             addRandomObject(2);
     }
     else if(level==6)
     {
-        for(i=0;i<127;i++)
+        addObstacle(150,200,390,280,["The research for your way in life is endless.",
+                                    "It's something biologically attached to our DNA,",
+                                    "something that helped the mankind to evolve until this point.",
+                                    "",
+                                    "Every great discovery was done because someone",
+                                    "missed something. Wanted to get more from his life.",
+                                    "",
+                                    "Do you really think that internet was made for cats?",
+                                    "It was made to gain access to all existing",
+                                    "information, in a single second.",
+                                    "So, you can browse searching for a purpose.",
+                                    "",
+                                    "We constantly need something more.",
+                                    "We are never satisfied.",
+                                    "So we will always search new stimuli.",
+                                    "",
+                                    "And this research will never end."]);
+        addObstacle(580,520,125,35,["Unlike this game."]);
+        addRandomObject(7);
+        addRandomObject(6);
+        addRandomObject(6);
+        addRandomObject(5);
+        addRandomObject(5);
+        addRandomObject(5);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        for(i=0;i<87;i++)
             addRandomObject(3);
         for(i=0;i<3;i++)
             addRandomObject(2);
     }
     else if(level==7)
     {
+        addObstacle(150,100,135,50,["This game will end","But so is your life."]);
+        addObstacle(250,200,200,50,["The end will be disappointing","Like your life."]);
+        addObstacle(30,300,160,50,["Filled with negativity.","Like your life."]);
+        addObstacle(250,400,170,50,["You will want to give up","Like in your life"]);
+        addObstacle(50,550,380,50,["Everyhing you have done to reach this point will be useless","Like.. well, you get it."]);
+        addObstacle(380,620,50,35,["But.."]);
+
         for(i=0;i<255;i++)
             addRandomObject(3);
         for(i=0;i<5;i++)
@@ -132,14 +181,123 @@ function generateLevel()
     }
     else if(level==8)
     {
-        for(i=0;i<511;i++)
+        addObstacle(150,100,270,100,["Life is not about finding the way.",
+                                    "It's not about reaching your destination.",
+                                    "",
+                                    "It's all about the journey.",
+                                    "And about what you will learn during it."]);
+        addObstacle(10,300,270,35,["And I think you learned something here.."]);
+        addRandomObject(10);
+        addRandomObject(9);
+        addRandomObject(9);
+        addRandomObject(8);
+        addRandomObject(8);
+        addRandomObject(8);
+        addRandomObject(7);
+        addRandomObject(7);
+        addRandomObject(7);
+        addRandomObject(6);
+        addRandomObject(6);
+        addRandomObject(6);
+        addRandomObject(6);
+        addRandomObject(5);
+        addRandomObject(5);
+        addRandomObject(5);
+        addRandomObject(5);
+        addRandomObject(5);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        addRandomObject(4);
+        for(i=0;i<311;i++)
             addRandomObject(3);
         for(i=0;i<9;i++)
             addRandomObject(2);
     }
     else if(level==9)
     {
-        //You won.
+        addObstacle(canvasW/2-150,canvasH/2-150,300,300,["","","","","","","","","                 Perfection is useless","","                     keep your edges"]);
+        tmp=new Object();
+        tmp.size=120;
+        tmp.rotation=0;
+        tmp.dx=0;
+        tmp.dy=0;
+        tmp.dr=0;
+        tmp.x=canvasW/2;
+        tmp.y=canvasH/2;
+        tmp.type=11;
+        tmp.color="#00F";
+        tmp.isFilled=false;
+        tmp.ignoreCollision=true;
+        drawableObjects.push(tmp);
+        tmp=new Object();
+        tmp.size=170;
+        tmp.rotation=0;
+        tmp.dx=0;
+        tmp.dy=0;
+        tmp.dr=1;
+        tmp.x=canvasW/2;
+        tmp.y=canvasH/2;
+        tmp.type=10;
+        tmp.color="#0F0";
+        tmp.isFilled=false;
+        tmp.ignoreCollision=true;
+        drawableObjects.push(tmp);
+        tmp=new Object();
+        tmp.size=190;
+        tmp.rotation=0;
+        tmp.dx=0;
+        tmp.dy=0;
+        tmp.dr=-1;
+        tmp.x=canvasW/2;
+        tmp.y=canvasH/2;
+        tmp.type=9;
+        tmp.color="#F00";
+        tmp.isFilled=false;
+        tmp.ignoreCollision=true;
+        drawableObjects.push(tmp);
+        tmp=new Object();
+        tmp.size=210;
+        tmp.rotation=0;
+        tmp.dx=0;
+        tmp.dy=0;
+        tmp.dr=1;
+        tmp.x=canvasW/2;
+        tmp.y=canvasH/2;
+        tmp.type=8;
+        tmp.color="#F0F";
+        tmp.isFilled=false;
+        tmp.ignoreCollision=true;
+        drawableObjects.push(tmp);
+        tmp=new Object();
+        tmp.size=230;
+        tmp.rotation=0;
+        tmp.dx=0;
+        tmp.dy=0;
+        tmp.dr=-1;
+        tmp.x=canvasW/2;
+        tmp.y=canvasH/2;
+        tmp.type=7;
+        tmp.color="#FF0";
+        tmp.isFilled=false;
+        tmp.ignoreCollision=true;
+        drawableObjects.push(tmp);
+        tmp=new Object();
+        tmp.size=250;
+        tmp.rotation=0;
+        tmp.dx=0;
+        tmp.dy=0;
+        tmp.dr=1;
+        tmp.x=canvasW/2;
+        tmp.y=canvasH/2;
+        tmp.type=6;
+        tmp.color="#0FF";
+        tmp.isFilled=false;
+        tmp.ignoreCollision=true;
+        drawableObjects.push(tmp);
+
     }
 }
 function addObstacle(x,y,w,h,text)
@@ -231,12 +389,15 @@ function run()
 
     if(level>0)
     {
-        ctx.fillStyle="#FFF";
-        ctx.fillRect(canvasW-180,canvasH-80,250,2);
-        ctx.fillRect(canvasW-180,canvasH-80,2,80);
-        ctx.font = "20px Arial";
-        ctx.fillText("NEXT",canvasW-90,canvasH-50);
-        ctx.fillText("LEVEL",canvasW-90,canvasH-20);
+        if(level<9)
+        {
+            ctx.fillStyle="#FFF";
+            ctx.fillRect(canvasW-180,canvasH-80,250,2);
+            ctx.fillRect(canvasW-180,canvasH-80,2,80);
+            ctx.font = "20px Arial";
+            ctx.fillText("NEXT",canvasW-90,canvasH-50);
+            ctx.fillText("LEVEL",canvasW-90,canvasH-20);
+        }
 
         noneSelected=true;
         hover=false;
@@ -335,7 +496,7 @@ function run()
 function getObjectInsideMouse()
 {
     for(i=0;i<drawableObjects.length;i++)
-        if(mousex+10>drawableObjects[i].x-drawableObjects[i].size && mousex<drawableObjects[i].x+drawableObjects[i].size && mousey+10>drawableObjects[i].y-drawableObjects[i].size && mousey<drawableObjects[i].y+drawableObjects[i].size)
+        if(mousex+20>drawableObjects[i].x-drawableObjects[i].size && mousex<drawableObjects[i].x+drawableObjects[i].size && mousey+20>drawableObjects[i].y-drawableObjects[i].size && mousey<drawableObjects[i].y+drawableObjects[i].size)
             return drawableObjects[i];
     return null;
 }
