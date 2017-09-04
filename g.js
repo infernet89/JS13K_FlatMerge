@@ -30,7 +30,7 @@ canvas = document.getElementById("g");
 ctx = canvas.getContext("2d");
 canvasW=canvas.width  = window.innerWidth;
 canvasH=canvas.height = window.innerHeight;
-var colorTypes=['','','#DDD','#D0D','#D00','#00D','#050','#0DD','#D50','#D55','#5D5','#0F0'];
+var colorTypes=['','','#DDD','#D0D','#D00','#50D','#050','#0DD','#D50','#D55','#5D5','#0F0'];
 
 
 /*if (window.navigator.pointerEnabled) {
@@ -690,7 +690,7 @@ function rilasciatoMouse(evt)
     if(selectedObject!=null)
     {
         //we need to merge
-        if(hoveredObject!=null && ammissiblePath(selectedObject,hoveredObject))
+        if(hoveredObject!=null && hoveredObject!=selectedObject && ammissiblePath(selectedObject,hoveredObject))
         {
             hoveredObject.isFilled=true;
             mergeObjectA=selectedObject;
@@ -709,11 +709,9 @@ function rilasciatoMouse(evt)
             cy=(mergeObjectA.y+mergeObjectB.y)/2;
             mergeObjectA.dx=(cx-mergeObjectA.x)/20;
             mergeObjectA.dy=(cy-mergeObjectA.y)/20;
-            if(mergeObjectB==exitObject)
-            {
-                mergeObjectA.ignoreCollision=true;
-            }
-            else
+            mergeObjectA.ignoreCollision=true;
+            mergeObjectB.ignoreCollision=true;
+            if(mergeObjectB!=exitObject)
             {
                 mergeObjectB.dx=(cx-mergeObjectB.x)/20;
                 mergeObjectB.dy=(cy-mergeObjectB.y)/20;
