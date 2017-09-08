@@ -47,7 +47,7 @@ canvas.addEventListener("mousemove",mossoMouse);
 canvas.addEventListener("mousedown",cliccatoMouse);
 canvas.addEventListener("mouseup",rilasciatoMouse);
 
-level=1;//TODO il menu, sullo ZERO.
+level=0;//TODO il menu, sullo ZERO.
 generateLevel();
 activeTask=setInterval(run, 33);
 
@@ -55,6 +55,8 @@ function generateLevel()
 {
     drawableObjects=[];
     obstacleObjects=[];
+    selectedObject=null;
+    hoveredObject=null;
     //next level button
     tmp=new Object();
     tmp.size=20;
@@ -69,11 +71,33 @@ function generateLevel()
     tmp.isFilled=true;
     drawableObjects.push(tmp); 
     exitObject=tmp;
-    if(level==1)
+    if(level==0)
+    {
+         addObstacle(canvasW/2-400,110,800,150,[""]);
+         addObstacle(50,450,280,60,["","Don't worry, you will learn through the way."]);
+         addObstacle(canvasW/2-50,canvasH-200,100,100,[""]);
+         exitObject.size=45;
+         exitObject.x=canvasW/2;
+         exitObject.y=canvasH-150;
+         addRandomObject(3);
+         for(i=0;i<4;i++)
+         {
+             addRandomObject(2);
+             addRandomObject(4);
+             addRandomObject(5);
+             addRandomObject(6);
+             addRandomObject(7);
+             addRandomObject(8);
+             addRandomObject(9);
+             addRandomObject(10);
+             addRandomObject(11);
+         }
+    }
+    else if(level==1)
     {
         addObstacle(200,200,200,45,["LOST: unable to find the way.",
                             "                  -Merriam-Webster"]);
-        addObstacle(150,300,430,30,["Sometimes, you don't even know what is the way you need to find"]);
+        addObstacle(150,300,430,30,["Sometimes, you don't even know WHAT is the way you need to find"]);
         for(i=0;i<3;i++)
             addRandomObject(3);
         for(i=0;i<77;i++)
@@ -387,110 +411,137 @@ function run()
     ctx.fillRect(0,0,1,canvasH);
     ctx.fillRect(canvasW-1,0,1,canvasH);
 
-    if(level>0)
+    if(level<9 && level!=0)
     {
-        if(level<9)
-        {
-            ctx.fillStyle="#FFF";
-            ctx.fillRect(canvasW-180,canvasH-80,250,2);
-            ctx.fillRect(canvasW-180,canvasH-80,2,80);
-            ctx.font = "20px Arial";
-            ctx.fillText("NEXT",canvasW-90,canvasH-50);
-            ctx.fillText("LEVEL",canvasW-90,canvasH-20);
-        }
+        ctx.fillStyle="#FFF";
+        ctx.fillRect(canvasW-180,canvasH-80,250,2);
+        ctx.fillRect(canvasW-180,canvasH-80,2,80);
+        ctx.font = "20px Arial";
+        ctx.fillText("NEXT",canvasW-90,canvasH-50);
+        ctx.fillText("LEVEL",canvasW-90,canvasH-20);
+    }
 
-        noneSelected=true;
-        hover=false;
-        //draw and move all objects
-        drawableObjects.forEach(function(e)
-        {
+    noneSelected=true;
+    hover=false;
+    //draw and move all objects
+    drawableObjects.forEach(function(e)
+    {
 
-            drawOject(e);
-            e.x+=e.dx;
-            e.y+=e.dy;
-            e.rotation+=e.dr;
-            //collisions
-            if(!e.ignoreCollision)
+        drawOject(e);
+        e.x+=e.dx;
+        e.y+=e.dy;
+        e.rotation+=e.dr;
+        //collisions
+        if(!e.ignoreCollision)
+        {
+            //edges of screen
+            if(e.x+e.dx>canvasW-e.size || e.x+e.dx<e.size)
+                e.dx*=-1;
+            if(e.y+e.dy>canvasH-e.size || e.y+e.dy<e.size)
+                e.dy*=-1;
+            //next button
+            if(e.x+e.size>canvasW-180 && e.y+e.dy+e.size>canvasH-80)
+                e.dy*=-1;
+            if(e.x+e.dx+e.size>canvasW-180 && e.y+e.size>canvasH-80)
+                e.dx*=-1;
+            //obstacles
+            obstacleObjects.forEach(function(o)
             {
-                //edges of screen
-                if(e.x+e.dx>canvasW-e.size || e.x+e.dx<e.size)
-                    e.dx*=-1;
-                if(e.y+e.dy>canvasH-e.size || e.y+e.dy<e.size)
+                //inside X
+                if(e.x+e.size>o.x && e.x-e.size<o.x+o.width && e.y+e.size+e.dy>o.y && e.y-e.size+e.dy<o.y+o.height)
                     e.dy*=-1;
-                //next button
-                if(e.x+e.size>canvasW-180 && e.y+e.dy+e.size>canvasH-80)
-                    e.dy*=-1;
-                if(e.x+e.dx+e.size>canvasW-180 && e.y+e.size>canvasH-80)
+                //inside Y
+                if(e.y+e.size>o.y && e.y-e.size<o.y+o.height && e.x+e.size+e.dx>o.x && e.x-e.size+e.dx<o.x+o.width)
                     e.dx*=-1;
-                //obstacles
-                obstacleObjects.forEach(function(o)
+            });
+            if(level==0)
+            {
+                drawableObjects.forEach(function(o)
                 {
                     //inside X
-                    if(e.x+e.size>o.x && e.x-e.size<o.x+o.width && e.y+e.size+e.dy>o.y && e.y-e.size+e.dy<o.y+o.height)
+                    if(o!=e && e.x+e.size>o.x && e.x-e.size<o.x+o.size && e.y+e.size+e.dy>o.y && e.y-e.size+e.dy<o.y+o.size)
                         e.dy*=-1;
                     //inside Y
-                    if(e.y+e.size>o.y && e.y-e.size<o.y+o.height && e.x+e.size+e.dx>o.x && e.x-e.size+e.dx<o.x+o.width)
+                    if(o!=e && e.y+e.size>o.y && e.y-e.size<o.y+o.size && e.x+e.size+e.dx>o.x && e.x-e.size+e.dx<o.x+o.size)
                         e.dx*=-1;
                 });
             }
-        });
-        //draw obstacles
-        obstacleObjects.forEach(function(e)
-        {
-            ctx.fillStyle="#FFF";
-            ctx.fillRect(e.x,e.y,e.width,2);
-            ctx.fillRect(e.x,e.y,2,e.height);
-            ctx.fillRect(e.x+e.width-2,e.y,2,e.height);
-            ctx.fillRect(e.x,e.y+e.height-2,e.width,2);
-            ctx.font = "14px Arial";
-            for(i=0;i<e.text.length;i++)
-                ctx.fillText(e.text[i],e.x+10,20+e.y+i*15);
-        });
-        //something is selected
-        if(selectedObject!=null && hoveredObject!=null)
-        {
-            ctx.beginPath();
-            //check if we have obstacles in the middle
-            if(ammissiblePath(selectedObject,hoveredObject))
-                ctx.strokeStyle="#6F6";
-            else
-                ctx.strokeStyle="#600";  
-            ctx.moveTo(hoveredObject.x,hoveredObject.y);
-            ctx.lineTo(selectedObject.x,selectedObject.y);
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.closePath();
         }
-        else if(selectedObject!=null)
-        {
-            ctx.beginPath();
-            ctx.strokeStyle="#FFF";
-            ctx.moveTo(mousex,mousey);
-            ctx.lineTo(selectedObject.x,selectedObject.y);
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.closePath();
-        }
-        //two object need to merge
-        if(mergeObjectA!=null && mergeObjectB!=null && (mergeObjectA.x - mergeObjectB.x)*(mergeObjectA.x - mergeObjectB.x)<mergeObjectA.size && (mergeObjectA.y - mergeObjectB.y)*(mergeObjectA.y - mergeObjectB.y)<mergeObjectA.size)
-        {
-            mergeObjectC.type=mergeObjectA.type+1;
-            mergeObjectC.x=mergeObjectA.x;
-            mergeObjectC.y=mergeObjectA.y;
-            mergeObjectC.color=colorTypes[mergeObjectC.type];
-            mergeObjectC.size=(mergeObjectA.size+mergeObjectB.size)/2;            
+    });
+    //draw obstacles
+    obstacleObjects.forEach(function(e)
+    {
+        ctx.fillStyle="#FFF";
+        ctx.fillRect(e.x,e.y,e.width,2);
+        ctx.fillRect(e.x,e.y,2,e.height);
+        ctx.fillRect(e.x+e.width-2,e.y,2,e.height);
+        ctx.fillRect(e.x,e.y+e.height-2,e.width,2);
+        ctx.font = "14px Arial";
+        for(i=0;i<e.text.length;i++)
+            ctx.fillText(e.text[i],e.x+10,20+e.y+i*15);
+    });
+    //something is selected
+    if(selectedObject!=null && hoveredObject!=null)
+    {
+        ctx.beginPath();
+        //check if we have obstacles in the middle
+        if(ammissiblePath(selectedObject,hoveredObject))
+            ctx.strokeStyle="#6F6";
+        else
+            ctx.strokeStyle="#600";  
+        ctx.moveTo(hoveredObject.x,hoveredObject.y);
+        ctx.lineTo(selectedObject.x,selectedObject.y);
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.closePath();
+    }
+    else if(selectedObject!=null && level!=0)
+    {
+        ctx.beginPath();
+        ctx.strokeStyle="#FFF";
+        ctx.moveTo(mousex,mousey);
+        ctx.lineTo(selectedObject.x,selectedObject.y);
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.closePath();
+    }
+    //two object need to merge
+    if(mergeObjectA!=null && mergeObjectB!=null && (mergeObjectA.x - mergeObjectB.x)*(mergeObjectA.x - mergeObjectB.x)<mergeObjectA.size && (mergeObjectA.y - mergeObjectB.y)*(mergeObjectA.y - mergeObjectB.y)<mergeObjectA.size)
+    {
+        mergeObjectC.type=mergeObjectA.type+1;
+        mergeObjectC.x=mergeObjectA.x;
+        mergeObjectC.y=mergeObjectA.y;
+        mergeObjectC.color=colorTypes[mergeObjectC.type];
+        mergeObjectC.size=(mergeObjectA.size+mergeObjectB.size)/2;            
 
-            drawableObjects.splice(drawableObjects.indexOf(mergeObjectA), 1);
-            drawableObjects.splice(drawableObjects.indexOf(mergeObjectB), 1);
-            drawableObjects.push(mergeObjectC);
-            if(mergeObjectB==exitObject)
-            {
-                level++;
-                generateLevel();
-            }
-            mergeObjectA=null;
-            mergeObjectB=null;
+        drawableObjects.splice(drawableObjects.indexOf(mergeObjectA), 1);
+        drawableObjects.splice(drawableObjects.indexOf(mergeObjectB), 1);
+        drawableObjects.push(mergeObjectC);
+        if(mergeObjectB==exitObject)
+        {
+            level++;
+            generateLevel();
         }
+        mergeObjectA=null;
+        mergeObjectB=null;
+    }
+
+    //menu
+    if(level==0)
+    {
+        ctx.fillStyle="#FFF";
+        ctx.font = "50px Arial";
+        ctx.fillText("Have you missed the",canvasW/2-390,160);
+        ctx.font = "80px Arial";
+        ctx.fillText("TUTORIAL for LIFE?",canvasW/2-350,240);
+        ctx.fillStyle="#000";
+        ctx.font = "20px Arial";
+        ctx.fillText("PLAY",canvasW/2-25,canvasH-145);
+        selectedObject=drawableObjects[1];
+        ctx.fillStyle="#FFF";
+        ctx.font = "12px Arial";
+        ctx.fillText("By Infernet89",canvasW-75,canvasH-5);
+        ctx.fillText("Made for JS13k Competition",5,canvasH-5);
     }
 }
 function getObjectInsideMouse()
