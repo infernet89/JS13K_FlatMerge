@@ -30,7 +30,7 @@ canvas = document.getElementById("g");
 ctx = canvas.getContext("2d");
 canvasW=canvas.width  = window.innerWidth;
 canvasH=canvas.height = window.innerHeight;
-var colorTypes=['','','#DDD','#D0D','#D00','#50D','#050','#0DD','#D50','#D55','#5D5','#0F0'];
+var colorTypes=['','','#DDD','#c1ba00','#D00','#50D','#050','#0DD','#D50','#D55','#5D5','#0F0'];
 
 
 /*if (window.navigator.pointerEnabled) {
@@ -47,7 +47,7 @@ canvas.addEventListener("mousemove",mossoMouse);
 canvas.addEventListener("mousedown",cliccatoMouse);
 canvas.addEventListener("mouseup",rilasciatoMouse);
 
-level=0;//TODO il menu, sullo ZERO.
+level=0;
 generateLevel();
 activeTask=setInterval(run, 33);
 
@@ -67,7 +67,7 @@ function generateLevel()
     tmp.dy=0;
     tmp.dr=0.5;
     tmp.type=level+3;//actually, number of edges
-    tmp.color="#0F0";
+    tmp.color=colorTypes[level+3];
     tmp.isFilled=true;
     drawableObjects.push(tmp); 
     exitObject=tmp;
@@ -125,7 +125,7 @@ function generateLevel()
     }
     else if(level==4)
     {
-        addObstacle(150,200,530,65,["One day some things matter, and another day some things doesn't matter anymore.",
+        addObstacle(150,200,530,65,["One day some things matter, and another day those things doesn't matter anymore.",
                                     "You'll never know.",
                                     "You can't predict what will matter someday."]);
         addObstacle(150,400,320,30,["Do you know what REALLY matter in this world?"]);
@@ -235,7 +235,7 @@ function generateLevel()
         addRandomObject(4);
         addRandomObject(4);
         addRandomObject(4);
-        for(i=0;i<311;i++)
+        for(i=0;i<131;i++)
             addRandomObject(3);
         for(i=0;i<9;i++)
             addRandomObject(2);
@@ -347,9 +347,9 @@ function addRandomObject(type)
     }
     while(insideObstacle(tmp));
     tmp.rotation=rand(0,360);
-    tmp.dx=rand(-5,5);
-    tmp.dy=rand(-5,5);
-    tmp.dr=rand(-5,5);
+    tmp.dx=rand(-4,4);
+    tmp.dy=rand(-4,4);
+    tmp.dr=rand(-4,4);
     tmp.type=type;
     tmp.color=colorTypes[tmp.type];
     tmp.isFilled=false;
@@ -749,11 +749,12 @@ function rilasciatoMouse(evt)
             
             mergeObjectC=new Object();
             mergeObjectC.dx=mergeObjectA.dx+mergeObjectB.dx;
-            mergeObjectC.dx=mergeObjectC.dx%5;
+            mergeObjectC.dx=mergeObjectC.dx%4;
             mergeObjectC.dy=mergeObjectA.dy+mergeObjectB.dy;
-            mergeObjectC.dy=mergeObjectC.dy%5;
+            mergeObjectC.dy=mergeObjectC.dy%4;
             mergeObjectC.rotation=0;
             mergeObjectC.dr=mergeObjectA.dr+mergeObjectB.dr;
+            mergeObjectC.dr=mergeObjectC.dr%4;
             mergeObjectC.ignoreCollision=false;
             //change dx and dy in order to put them together, fast
             cx=(mergeObjectA.x+mergeObjectB.x)/2;
