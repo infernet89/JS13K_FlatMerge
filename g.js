@@ -30,6 +30,9 @@ canvas = document.getElementById("g");
 ctx = canvas.getContext("2d");
 canvasW=canvas.width  = window.innerWidth;
 canvasH=canvas.height = window.innerHeight;
+canvasW=(canvasH/800)*1200;
+/*canvasW=1200;
+canvasH=800;*/
 var colorTypes=['','','#DDD','#c1ba00','#D00','#50D','#050','#0DD','#D50','#D55','#5D5','#0F0'];
 
 
@@ -69,6 +72,7 @@ function generateLevel()
     tmp.type=level+3;//actually, number of edges
     tmp.color=colorTypes[level+3];
     tmp.isFilled=true;
+    tmp.alpha=1;
     drawableObjects.push(tmp); 
     exitObject=tmp;
     if(level==0)
@@ -80,7 +84,7 @@ function generateLevel()
          exitObject.x=canvasW/2;
          exitObject.y=canvasH-150;
          addRandomObject(3);
-         for(i=0;i<4;i++)
+         for(i=0;i<3;i++)
          {
              addRandomObject(2);
              addRandomObject(4);
@@ -97,7 +101,7 @@ function generateLevel()
     {
         addObstacle(200,200,200,45,["LOST: unable to find the way.",
                             "                  -Merriam-Webster"]);
-        addObstacle(150,300,430,30,["Sometimes, you don't even know WHAT is the way you need to find"]);
+        addObstacle(150,300,435,30,["Sometimes, you don't even know WHAT is the way you need to find"]);
         for(i=0;i<3;i++)
             addRandomObject(3);
         for(i=0;i<77;i++)
@@ -333,6 +337,7 @@ function addObstacle(x,y,w,h,text)
     tmp.height=h;
     tmp.color="#FFF";
     tmp.text=text;
+    tmp.alpha=0;
     obstacleObjects.push(tmp);
 }
 function addRandomObject(type)
@@ -354,6 +359,7 @@ function addRandomObject(type)
     tmp.color=colorTypes[tmp.type];
     tmp.isFilled=false;
     tmp.ignoreCollision=false;
+    tmp.alpha=-0.1*type;
     drawableObjects.push(tmp); 
 }
 //check if there are obstacles in the middle of A and B
@@ -426,7 +432,7 @@ function run()
     //draw and move all objects
     drawableObjects.forEach(function(e)
     {
-
+        if(e.alpha<1) e.alpha+=0.05;
         drawOject(e);
         e.x+=e.dx;
         e.y+=e.dy;
@@ -471,6 +477,8 @@ function run()
     //draw obstacles
     obstacleObjects.forEach(function(e)
     {
+        if(e.alpha<1) e.alpha+=0.05;
+        ctx.globalAlpha=e.alpha;
         ctx.fillStyle="#FFF";
         ctx.fillRect(e.x,e.y,e.width,2);
         ctx.fillRect(e.x,e.y,2,e.height);
@@ -479,6 +487,7 @@ function run()
         ctx.font = "14px Arial";
         for(i=0;i<e.text.length;i++)
             ctx.fillText(e.text[i],e.x+10,20+e.y+i*15);
+        ctx.globalAlpha=1;
     });
     //something is selected
     if(selectedObject!=null && hoveredObject!=null)
@@ -506,7 +515,7 @@ function run()
         ctx.closePath();
     }
     //two object need to merge
-    if(mergeObjectA!=null && mergeObjectB!=null && (mergeObjectA.x - mergeObjectB.x)*(mergeObjectA.x - mergeObjectB.x)<mergeObjectA.size && (mergeObjectA.y - mergeObjectB.y)*(mergeObjectA.y - mergeObjectB.y)<mergeObjectA.size)
+    if(mergeObjectA!=null && mergeObjectB!=null && (mergeObjectA.x - mergeObjectB.x)*(mergeObjectA.x - mergeObjectB.x)<1 && (mergeObjectA.y - mergeObjectB.y)*(mergeObjectA.y - mergeObjectB.y)<1)
     {
         mergeObjectC.type=mergeObjectA.type+1;
         mergeObjectC.x=mergeObjectA.x;
@@ -660,6 +669,7 @@ function drawOject(o)
     }
     ctx.closePath();
     ctx.lineWidth = 1;
+    ctx.globalAlpha = (o.alpha>0) ? o.alpha : 0;
     ctx.strokeStyle=o.color;
     ctx.fillStyle=o.color;
     if(o.isFilled)
@@ -706,8 +716,8 @@ function cliccatoMouse(evt)
 {
     dragging=true;
     var rect = canvas.getBoundingClientRect();
-    mousex=(evt.clientX-rect.left)/(rect.right-rect.left)*canvasW;
-    mousey=(evt.clientY-rect.top)/(rect.bottom-rect.top)*canvasH;
+    mousex=(evt.clientX-rect.left)/(rect.right-rect.left)*window.innerWidth;
+    mousey=(evt.clientY-rect.top)/(rect.bottom-rect.top)*window.innerHeight;
 
     //check if something is selected
     if(selectedObject!=null)
@@ -723,8 +733,8 @@ function cliccatoMouse(evt)
 function mossoMouse(evt)
 {
     var rect = canvas.getBoundingClientRect();
-    mousex=(evt.clientX-rect.left)/(rect.right-rect.left)*canvasW;
-    mousey=(evt.clientY-rect.top)/(rect.bottom-rect.top)*canvasH;
+    mousex=(evt.clientX-rect.left)/(rect.right-rect.left)*window.innerWidth;
+    mousey=(evt.clientY-rect.top)/(rect.bottom-rect.top)*window.innerHeight;
 
     if(selectedObject!=null)
     {
@@ -752,8 +762,16 @@ function rilasciatoMouse(evt)
             mergeObjectC.dx=mergeObjectC.dx%4;
             mergeObjectC.dy=mergeObjectA.dy+mergeObjectB.dy;
             mergeObjectC.dy=mergeObjectC.dy%4;
-            mergeObjectC.rotation=0;
-            mergeObjectC.dr=mergeObjectA.dr+mergeObjectB.dr;
+            //todo match rotation
+            mergeObjectA.rotation=mergeObjectA.rotation%360;
+            mergeObjectB.rotation=mergeObjectB.rotation%360;
+            mergeObjectC.rotation=(mergeObjectA.rotation+mergeObjectB.rotation)/2;
+            mergeObjectC.dr=(mergeObjectA.dr+mergeObjectB.dr)/2;
+            mergeObjectA.dr=(mergeObjectA.rotation-mergeObjectC.rotation)/20;
+            mergeObjectB.dr=(mergeObjectB.rotation-mergeObjectC.rotation)/20;
+
+
+            mergeObjectC.alpha=0.5;
             mergeObjectC.dr=mergeObjectC.dr%4;
             mergeObjectC.ignoreCollision=false;
             //change dx and dy in order to put them together, fast
@@ -775,3 +793,57 @@ function rilasciatoMouse(evt)
     selectedObject=null;
     hoveredObject=null;
 }
+window.AutoScaler = function(element, initialWidth, initialHeight, skewAllowance){
+    var self = this;
+    
+    this.viewportWidth  = 0;
+    this.viewportHeight = 0;
+    
+    if (typeof element === "string")
+        element = document.getElementById(element);
+    
+    this.element = element;
+    this.gameAspect = initialWidth/initialHeight;
+    this.skewAllowance = skewAllowance || 0;
+    
+    this.checkRescale = function() {
+        if (window.innerWidth == self.viewportWidth && 
+            window.innerHeight == self.viewportHeight) return;
+        
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        
+        var windowAspect = w/h;
+        var targetW = 0;
+        var targetH = 0;
+        
+        targetW = w;
+        targetH = h;
+        
+        if (Math.abs(windowAspect - self.gameAspect) > self.skewAllowance) {
+            if (windowAspect < self.gameAspect)
+                targetH = w / self.gameAspect;
+            else
+                targetW = h * self.gameAspect;
+        }
+        
+        self.element.style.width  = targetW + "px";
+        self.element.style.height = targetH + "px";
+    
+        self.element.style.marginLeft = ((w - targetW)/2) + "px";
+        self.element.style.marginTop  = ((h - targetH)/2) + "px";
+    
+        self.viewportWidth  = w;
+        self.viewportHeight = h;
+        
+    }
+    
+    // Ensure our element is going to behave:
+    self.element.style.display = 'block';
+    self.element.style.margin  = '0';
+    self.element.style.padding = '0';
+    
+    // Add event listeners and timer based rescale checks:
+    window.addEventListener('resize', this.checkRescale);
+    rescalercheck=setInterval(this.checkRescale, 150);
+};
