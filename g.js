@@ -26,6 +26,7 @@ var mousey=-100;
 var dragging=false;
 
 //sounds
+var isSoundEnabled=true;
 var bgmusic = new Audio("Sound/20170917.mp3");
 bgmusic.addEventListener('ended', function() {
     this.currentTime = 0;
@@ -66,6 +67,7 @@ else
 canvas.addEventListener("mousemove",mossoMouse);
 canvas.addEventListener("mousedown",cliccatoMouse);
 canvas.addEventListener("mouseup",rilasciatoMouse);
+window.addEventListener('keyup',keyUp,false);
 
 level=0;
 generateLevel();
@@ -544,7 +546,9 @@ function run()
         drawableObjects.splice(drawableObjects.indexOf(mergeObjectB), 1);
         drawableObjects.push(mergeObjectC);
         //sound effect
-        if(mergeObjectC.type>9)
+        if(!isSoundEnabled)
+            level=level;
+        else if(mergeObjectC.type>9)
             snd8.play();
         else if(mergeObjectC.type>6)
             snd4.play();
@@ -817,6 +821,15 @@ function rilasciatoMouse(evt)
     }
     selectedObject=null;
     hoveredObject=null;
+}
+function keyUp(e) {
+    //alert(e.keyCode);
+    if(e.keyCode==77 || e.keyCode==83)//m OR s
+    {
+        isSoundEnabled=!isSoundEnabled;
+        if(isSoundEnabled) bgmusic.play();
+        else bgmusic.pause();
+    }
 }
 window.AutoScaler = function(element, initialWidth, initialHeight, skewAllowance){
     var self = this;
