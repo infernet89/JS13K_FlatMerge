@@ -25,6 +25,23 @@ var mousex=-100;
 var mousey=-100;
 var dragging=false;
 
+//sounds
+var bgmusic = new Audio("Sound/20170917.mp3");
+bgmusic.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+}, false);
+bgmusic.addEventListener('timeupdate', function(){
+            var buffer = .44
+            if(this.currentTime > this.duration - buffer){
+                this.currentTime = 0
+                this.play()
+            }}, false);
+var snd1 = new Audio("Sound/4.wav");
+var snd4 = new Audio("Sound/4.wav");
+var snd8 = new Audio("Sound/4.wav");
+bgmusic.play();
+
 //setup
 canvas = document.getElementById("g");
 ctx = canvas.getContext("2d");
@@ -526,6 +543,14 @@ function run()
         drawableObjects.splice(drawableObjects.indexOf(mergeObjectA), 1);
         drawableObjects.splice(drawableObjects.indexOf(mergeObjectB), 1);
         drawableObjects.push(mergeObjectC);
+        //sound effect
+        if(mergeObjectC.type>9)
+            snd8.play();
+        else if(mergeObjectC.type>6)
+            snd4.play();
+        else if(mergeObjectC.type>3)
+            snd1.play();
+
         if(mergeObjectB==exitObject)
         {
             level++;
