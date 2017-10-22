@@ -70,7 +70,7 @@ canvas.addEventListener("mousedown",cliccatoMouse);
 canvas.addEventListener("mouseup",rilasciatoMouse);
 window.addEventListener('keyup',keyUp,false);
 
-level=0+9;
+level=0;
 generateLevel();
 activeTask=setInterval(run, 33);
 
@@ -352,9 +352,15 @@ function generateLevel()
     else if(level==9)
     {
         if(ocdMode)
+        {
             addObstacle(canvasW/2-150,canvasH/2-150,300,300,[""]);
+            kongregate.stats.submit("OCDgameCompleted",1);
+        }   
         else
+        {
+            kongregate.stats.submit("gameCompleted",1);
             addObstacle(canvasW/2-150,canvasH/2-150,300,300,["","","","","","","","","                 Perfection is useless","","                     keep your edges"]);
+        }
         tmp=new Object();
         tmp.alpha=0;
         tmp.size=120;
@@ -370,7 +376,7 @@ function generateLevel()
         tmp.ignoreCollision=true;
         drawableObjects.push(tmp);
         tmp=new Object();
-        tmp.alpha=0;
+        tmp.alpha=-1;
         tmp.size=170;
         tmp.rotation=0;
         tmp.dx=0;
@@ -384,7 +390,7 @@ function generateLevel()
         tmp.ignoreCollision=true;
         drawableObjects.push(tmp);
         tmp=new Object();
-        tmp.alpha=0;
+        tmp.alpha=-2;
         tmp.size=190;
         tmp.rotation=0;
         tmp.dx=0;
@@ -398,7 +404,7 @@ function generateLevel()
         tmp.ignoreCollision=true;
         drawableObjects.push(tmp);
         tmp=new Object();
-        tmp.alpha=0;
+        tmp.alpha=-3;
         tmp.size=210;
         tmp.rotation=0;
         tmp.dx=0;
@@ -412,7 +418,7 @@ function generateLevel()
         tmp.ignoreCollision=true;
         drawableObjects.push(tmp);
         tmp=new Object();
-        tmp.alpha=0;
+        tmp.alpha=-4;
         tmp.size=230;
         tmp.rotation=0;
         tmp.dx=0;
@@ -426,7 +432,7 @@ function generateLevel()
         tmp.ignoreCollision=true;
         drawableObjects.push(tmp);
         tmp=new Object();
-        tmp.alpha=0;
+        tmp.alpha=-5;
         tmp.size=250;
         tmp.rotation=0;
         tmp.dx=0;
@@ -574,7 +580,7 @@ function run()
                 if(e.y+e.size>o.y && e.y-e.size<o.y+o.height && e.x+e.size+e.dx>o.x && e.x-e.size+e.dx<o.x+o.width)
                     e.dx*=-1;
             });
-            if(level==0)
+            if(level==6660)
             {
                 drawableObjects.forEach(function(o)
                 {
@@ -684,7 +690,7 @@ function run()
             if(e.isFilled)
                 nFilledObjects++;
         });
-        if(nFilledObjects>=23)
+        if(nFilledObjects>=25)
         {
             ctx.fillText("OCD mode",canvasW/2-30,canvasH-130);
             ocdMode=true;
@@ -903,7 +909,7 @@ function rilasciatoMouse(evt)
     if(selectedObject!=null)
     {
         //we need to merge
-        if(hoveredObject!=null && hoveredObject!=selectedObject && ammissiblePath(selectedObject,hoveredObject))
+        if(hoveredObject!=null && hoveredObject!=selectedObject && ammissiblePath(selectedObject,hoveredObject) && mergeObjectA==null && mergeObjectB==null)
         {
             hoveredObject.isFilled=true;
             mergeObjectA=selectedObject;
